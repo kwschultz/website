@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Virtual California</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	
+	<link rel="stylesheet" type="text/css" href="../css/ivory.css" media="all">
+	
+	
+	<style>
+		.content{width: 100%; height: auto; background-color: #EBEAE8; padding: 30px 12px;}
+	.note {
+		background-color: #ffffff; 
+		padding: 10px 0; 
+		color: #333333; 
+				border-radius:5px; 
+		   -moz-border-radius:5px; 
+		-webkit-border-radius:5px;
+				box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+	       -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+		-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+	}
+	</style>
+	
+</head>
+<body>
+
+	<div class="content">
+	<div class="grid">
+		<div class="g768">
+            
+            <!--------    name  row  -------- -->
+			<div class="row">
+                <!--         contact info      -->
+                <div class="c4 first">
+                    <h5 class="text-center"><a href="http://schultz.physics.ucdavis.edu/"> Kasey W. Schultz </a></h5>
+                    <p class="note text-center"> kwschultz AT ucdavis DOT edu <br> Office: Physics 532 <br> Advisor: Dr. John Rundle
+                    </p>
+                    
+                </div>
+                
+                
+                <!--   blank -->
+                <div class="c4"></div>
+                
+                <!--           pic        -->
+                <div class="c4 last">
+				    <img src="../images/self.png" width="200" height="200" align="middle">
+			    </div>
+            </div>
+            </div>
+        
+    
+        
+        <!--------          research box       -------- -->
+        <div class="g768">
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center">Virtual California Earthquake Simulator </h6>    
+                    <p class="text-left"> Virtual California (VC) is a boundary element code that models the earthquake fault system in California. It uses geologic observations to define fault topology, slip rates, and frictional parameters. The faults are meshed into fault segments, the functional elements of the simulation. Virtual California is designed to explore the statistics of seismicity in today's faults by simulating stress interactions between individual fault elements. Earthquakes are triggered by elements reaching their stress threshold values, which are determined by the fault model. During the rupture (earthquake) elements fail (slip) and release stress. 
+                    </p>
+                </div>
+            </div>
+        </div>    
+            
+        <hr>    
+        
+        <!--     Forecasting   -->
+            
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center">Computing Earthquake Probabilities </h6>    
+                    <p class="text-left"> The simulation output relevant to computing earthquake probabilities are the recurrance times, or the time between successive earthquakes on a given fault. We can take these recurrance times from the simulation output, and by computing the cumulative histogram of recurrence times we compute the cumulative probability distribution for an earthquake on the specified fault. From this distribution we can also compute the average waiting times until the next major earthquake, as a function of the time since the last large earthquake. The Virtual California computed earthquake probabilities and waiting times are given for Northern and Southern California at the links below.
+                    </p>
+                </div>
+            </div>
+
+        
+            <div class="row">
+                <div class="c6 first">
+                    <h6 class="note text-center"> Northern California <a href="/docs/NorCal_Forecast.pdf" target="_blank">Forecast</a> M > 7.5  </h6>
+                </div>
+                
+                <div class="c6 last">
+                    <h6 class="note text-center"> Southern California <a href="/docs/SoCal_Forecast.pdf" target="_blank">Forecast</a> M > 7.0  </h6>
+                </div>
+            </div>
+        </div>    
+
+        <!--   end forecast -->
+        
+        
+            
+        <hr>    
+            
+        <div class="g768">    
+            <div class="row">
+                <div class="c6 first">
+                    <h6 class="note text-center"> Surface Displacements  </h6> 
+                    <img src="../images/231185_displ_sf_web.png" width="372" height="383" align="middle">
+                    <p class="text-left"> InSAR interferogram showing vertical displacements for a large earthquake simulated earthquake (similar magnitude, rupture length and average slip as the 1906 San Francisco earthquake) on the northern San Andreas Fault, as seen by an orbiting satellite. Vertical displacements are computed via Okada's half-space deformation functions. 
+                    </p>
+                </div>
+                
+                
+                <div class="c6 last">
+                    <h6 class="note text-center"> Surface Gravity Changes </h6>    
+                    <img src="../images/231185_dg_sf_alt.png" width="372" height="383" align="middle">
+                    <p class="text-left"> VC computes gravity changes for the same simulated event by passing the fault geometry and the slips for each element as input into Okubo's gravity Green's functions. These statistical data sets of gravity changes and vertical displacements can help develop and test future satellite-based earthquake/tsunami early warning systems. </p>
+                </div>
+                
+                
+            </div>
+            
+
+            <div class="row">
+
+                <div class="c12">
+                    <h6 class="note text-center"> Fundamental Gravity Patterns </h6> 
+               
+                    <div class="c12 centered">
+                        <p class="text-left"> VC computed gravity changes for 5 meters of slip on a 10km by 10km fault element for the 3 fundamental fault geometries. Each element is embedded in a homogeneous elastic half-space, the depth to the top of each fault element is 1km, and the color unit is microGal [10^-8 m/s^2]. The view is of the surface of the half-space looking straight down from above, and the thick black line is a projection of the fault plane onto the surface.</p>
+                    </div>
+                    
+
+                    <div class="c4 first">
+                        <img src="../images/dg_strikeslip5_dip90_L10k_W10k_c11k_dg_paper_hi_trim.png" width="250" height="255" align="middle">
+                        <p class="text-center"> Strike-slip faulting, dip = 90 degrees.  </p>
+                    </div>
+               
+                    <div class="c4">
+                        <img src="../images/dg_normal5_dip60_L10k_W10k_c10k_dg_paper_hi_trim.png" width="248" height="255" align="middle">
+                        <p class="text-center"> &nbsp;&nbsp; Normal faulting, dip = 30 degrees</p>
+                    </div>
+
+                    <div class="c4 last">
+                        <img src="../images/dg_thrust5_dip30_L10k_W10k_c6k_dg_paper_hi_trim.png" width="248" height="255" align="middle">
+                        <p class="text-center">Thrust faulting, dip = 60 degrees.</p>
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+
+
+
+            
+            <div class="row">
+            
+                <div class="c12">
+                        <h6 class="note text-center"> Co-seismic Gravity Changes </h6> 
+                        <video width="768" height="576" controls>
+                            <source src="../images/VC_gravity_changes_100yr.mp4" type="video/mp4">
+                        </video>
+                        <p class="text-left"> This video is a way of "watching" 100 years of a Virtual California simulation. This is not a time dependent evolution of the gravity field, but is a visualization of co-seismic gravity changes for all earthquakes in the time frame. Gravity fields fade with time to smooth the animation. The majority of the events are strike-slip faults (plate boundary similar to rubbing two bricks together on their long edge) and have a characteristic butterfly pattern. The inset plot on the lower left is the cumulative frequency-magnitude distribution. </p>
+                </div>
+            </div>
+            
+            
+            <div class="row">
+                <div class="c6 first">
+                    <h6 class="note text-center"> Frequency vs. Magnitude  </h6> 
+                    <img src="../images/web_sim_full_freq_mag.png" width="372" height="372" align="middle">
+                    <p class="text-left"> Earthquake frequency simulated by VC, averaged over 500,000 years of simulated time, plotted as function of magnitude, red error bars denote the observed earthquake rates in California, and the gray line is the Gutenberg-Richter law. Deficiency of simulated events below magnitude 6.0 is due to the finite size of each fault element in the simulation; smaller fault elements would yield more small events.
+                    </p>
+                </div>
+                
+                
+                <div class="c6 last">
+                    <h6 class="note text-center"> Magnitude vs. Rupture Area </h6>    
+                    <img src="../images/web_sim_full_magn_rup_area.png" width="372" height="372" align="middle">
+                    <p class="text-left"> Magnitude plotted as function of the log of rupture area, red line is the published scaling relationship by Wells and Coppersmith. </p>
+                </div>    
+            </div>
+        </div>        
+        
+        
+        
+        
+        <hr>
+        
+        
+        
+        
+        
+        <div class="g768">
+            <div class="row">
+                <div class="c8 centered">
+                    <h6 class="note text-center"> Current and Future Research Topics </h6> 
+				    <ul class="square">
+					   <li> Computing earthquake probabilities, forecasting with VC            </li>
+			                   <li> Subduction zone thrust fault modeling, field visualizations        </li>
+           		                   <li> Gravity/Displacements/Potential time series correlations           </li>
+					   <li> Southern San Andreas Fault, matching paleoseismic recurrance times </li>
+				    </ul>
+
+                </div>
+            </div>
+        </div>
+        
+        
+        
+		</div><!-- grid -->
+	</div><!-- content -->
+    
+        <!-- BOTTOM LINE -->
+        <!-- -----------  
+		<div class="row">
+			<div class="c12 first">
+				<p class="text-right">Ivory CSS by <a href="http://weice.in" target="_blank">WEICE</a>, modified 05/16/2014 &nbsp;&nbsp;&nbsp;&nbsp;</p>
+			</div>
+				
+		</div>
+        -->
+
+</body>
+</html>
