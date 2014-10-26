@@ -58,7 +58,11 @@
             <div class="row">
                 <div class="c12 first">
                     <h6 class="note text-center">Virtual California Earthquake Simulator </h6>    
-                    <p class="text-left"> Virtual California (VC) is a boundary element code that models the earthquake fault system in California. It uses geologic observations to define fault topology, slip rates, and frictional parameters. The faults are meshed into fault segments, the functional elements of the simulation. Virtual California is designed to explore the statistics of seismicity in today's faults by simulating stress interactions between individual fault elements. Earthquakes are triggered by elements reaching their stress threshold values, which are determined by the fault model. During the rupture (earthquake) elements fail (slip) and release stress. 
+                    <p class="text-left">
+                    Virtual California has become the standard fault system simulator code for California and it is the most widely used. It is now maintained by the NSF-supported Computational Infrastructure for Geodynamics ( <a href="http://geodynamics.org/cig/software/vc/" target="_blank">CIG</a>). In the first three months after being released on CIG, it was downloaded more than 60 times by users on four continents. Virtual California will be one of the two earthquake simulators used to analyze the recently released UCERF3 fault model for California, the standard California fault system produced by the Working Group on California Earthquake Probabilities and the USGS. Furthermore, in 2012 Virtual California — as a member of the QuakeSim team — was co-winner of NASA’s Software of the Year award.
+                    
+                    
+                    Virtual California (VC) is a boundary element code that models the earthquake fault system in California. VC is designed to explore the statistics of seismicity in today's fault system by simulating stress interactions between faults. In a simulation, the faults slowly creep at the geologically observed rates and earthquakes are triggered by the stress on individual faults reaching the critical value, determined by known scaling relations. During the rupture (earthquake) faults slip and release accumulated stress.
                     </p>
                 </div>
             </div>
@@ -72,7 +76,7 @@
             <div class="row">
                 <div class="c12 first">
                     <h6 class="note text-center">Computing Earthquake Probabilities </h6>    
-                    <p class="text-left"> The simulation output relevant to computing earthquake probabilities are the recurrance times, or the time between successive earthquakes on a given fault. We can take these recurrance times from the simulation output, and by computing the cumulative histogram of recurrence times we compute the cumulative probability distribution for an earthquake on the specified fault. From this distribution we can also compute the average waiting times until the next major earthquake, as a function of the time since the last large earthquake. The Virtual California computed earthquake probabilities and waiting times are given for Northern and Southern California at the links below.
+                    <p class="text-left"> The simulation output relevant to computing earthquake probabilities are the recurrance times, or the time between successive earthquakes on a given fault. We can take these recurrance times from the simulation output, and by computing the cumulative histogram of recurrence times we compute the cumulative probability distribution for an earthquake on the specified fault. From this distribution we can also compute the expected waiting times until the next earthquake, as a function of the time since the last large earthquake. The Virtual California computed earthquake probabilities and waiting times are given for Northern and Southern California at the links below.
                     </p>
                 </div>
             </div>
@@ -100,14 +104,14 @@
                 <div class="c6 first">
                     <h6 class="note text-center"> Surface Displacements  </h6> 
                     <img src="../images/231185_displ_sf_web.png" width="372" height="383" align="middle">
-                    <p class="text-left"> InSAR interferogram showing vertical displacements for a large earthquake simulated earthquake (similar magnitude, rupture length and average slip as the 1906 San Francisco earthquake) on the northern San Andreas Fault, as seen by an orbiting satellite. Vertical displacements are computed via Okada's half-space deformation functions. 
+                    <p class="text-left"> InSAR interferogram showing vertical displacements for a large earthquake simulated earthquake (similar magnitude, rupture length and average slip as the 1906 San Francisco earthquake) on the northern San Andreas Fault, as seen by an orbiting satellite. Vertical displacements are computed via Okada's half-space deformation functions. Count the number of cycles from blue -> red, multiply by 0.03m to get the displacement.
                     </p>
                 </div>
                 
                 
                 <div class="c6 last">
                     <h6 class="note text-center"> Surface Gravity Changes </h6>    
-                    <img src="../images/231185_dg_sf_alt.png" width="372" height="383" align="middle">
+                    <img src="../images/231185_dg_total_SF_web.png" width="372" height="383" align="middle">
                     <p class="text-left"> VC computes gravity changes for the same simulated event by passing the fault geometry and the slips for each element as input into Okubo's gravity Green's functions. These statistical data sets of gravity changes and vertical displacements can help develop and test future satellite-based earthquake/tsunami early warning systems. </p>
                 </div>
                 
@@ -121,7 +125,9 @@
                     <h6 class="note text-center"> Fundamental Gravity Patterns </h6> 
                
                     <div class="c12 centered">
-                        <p class="text-left"> VC computed gravity changes for 5 meters of slip on a 10km by 10km fault element for the 3 fundamental fault geometries. Each element is embedded in a homogeneous elastic half-space, the depth to the top of each fault element is 1km, and the color unit is microGal [10^-8 m/s^2]. The view is of the surface of the half-space looking straight down from above, and the thick black line is a projection of the fault plane onto the surface.</p>
+                        <p class="text-left"> I have added to Virtual California the ability to compute co-seismic gravity changes. This was accomplished via a custom implementation of gravity Green's functions given in Okubo 1992.
+                        
+                        Shown below are the VC-computed gravity changes for 5 meters of slip on a simple 10km by 10km fault for the 3 fundamental fault geometries. Each element is embedded in a homogeneous elastic half-space, the depth to the top of each fault element is 1km, and the color unit is microGal [10^-8 m/s^2]. The view is looking straight down onto the surface from above, and the thick black line is a projection of the fault plane onto the surface.</p>
                     </div>
                     
 
@@ -157,7 +163,7 @@
                         <video width="768" height="576" controls>
                             <source src="../images/VC_gravity_changes_100yr.mp4" type="video/mp4">
                         </video>
-                        <p class="text-left"> This video is a way of "watching" 100 years of a Virtual California simulation. This is not a time dependent evolution of the gravity field, but is a visualization of co-seismic gravity changes for all earthquakes in the time frame. Gravity fields fade with time to smooth the animation. The majority of the events are strike-slip faults (plate boundary similar to rubbing two bricks together on their long edge) and have a characteristic butterfly pattern. The inset plot on the lower left is the cumulative frequency-magnitude distribution. </p>
+                        <p class="text-left"> This video is a way of visualizing gravity changes for earthquakes over a 100 year interval of a Virtual California simulation. This is not a time dependent evolution of the gravity field, but is a "slideshow" of co-seismic gravity changes for all earthquakes in the time frame. Gravity fields are made to fade with time to smooth the animation. The majority of the events are strike-slip faults (plate motion is similar to rubbing two bricks together on their long edge) and have a characteristic butterfly pattern in the gravity signal. The inset plot on the lower left is the cumulative frequency-magnitude distribution. </p>
                 </div>
             </div>
             
@@ -174,7 +180,7 @@
                 <div class="c6 last">
                     <h6 class="note text-center"> Magnitude vs. Rupture Area </h6>    
                     <img src="../images/web_sim_full_magn_rup_area.png" width="372" height="372" align="middle">
-                    <p class="text-left"> Magnitude plotted as function of the log of rupture area, red line is the published scaling relationship by Wells and Coppersmith. </p>
+                    <p class="text-left"> Scaling relation between magnitude the rupture area (M vs logRA), red line is the published scaling relationship by Wells and Coppersmith 1994. </p>
                 </div>    
             </div>
         </div>        
@@ -195,8 +201,9 @@
 				    <ul class="square">
 					   <li> Computing earthquake probabilities, forecasting with VC            </li>
 			                   <li> Subduction zone thrust fault modeling, field visualizations        </li>
+                               <li> Producing a Python module for sim data analysis and visualizations shown above</li>
            		                   <li> Gravity/Displacements/Potential time series correlations           </li>
-					   <li> Southern San Andreas Fault, matching paleoseismic recurrance times </li>
+					   <li> Southern San Andreas Fault, matching paleoseismic recurrence times </li>
 				    </ul>
 
                 </div>
