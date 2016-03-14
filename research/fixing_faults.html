@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Fixing Faults</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	
+	<link rel="stylesheet" type="text/css" href="../css/ivory.css" media="all">
+	
+	
+	<style>
+		.content{width: 100%; height: auto; background-color: #EBEAE8; padding: 30px 12px;}
+	.note {
+		background-color: #ffffff; 
+		padding: 10px 0; 
+		color: #333333; 
+				border-radius:5px; 
+		   -moz-border-radius:5px; 
+		-webkit-border-radius:5px;
+				box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+	       -moz-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+		-webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+	}
+	</style>
+	
+</head>
+<body>
+
+	<div class="content">
+	<div class="grid">
+		<div class="g768">
+            
+            <!--------    name  row  -------- -->
+			<div class="row">
+                <!--         contact info      -->
+                <div class="c4 first">
+                    <h5 class="text-center"><a href="http://schultz.physics.ucdavis.edu/"> Kasey W. Schultz </a></h5>
+                    <p class="note text-center"> kwschultz@ucdavis.edu <br> <a href="http://github.com/kwschultz/" target="_blank">github.com/kwschultz</a> <br> Advisor: Prof. John Rundle
+                    </p>
+                    
+                </div>
+                
+                
+                <!--   blank -->
+                <div class="c4"></div>
+                
+                <!--           pic        -->
+                <div class="c4 last">
+				    <img src="../images/self.png" width="150" height="150" align="middle">
+			    </div>
+            </div>
+            </div>
+        
+    
+        
+        <!--------          research box       -------- -->
+        <div class="g768">
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center">What to do when the USGS gives you a <b>broken</b> fault model? </h6>
+                    <p class="text-left">
+                    The United States Geological Survey (USGS) is the authority on all things earthquake in the United States. They are tasked with producing the model of the California fault system that we use in the Virtual Quake simulator. And I have recently found that this fault model (UCERF3) is wrong, very wrong. For example, the model has the northern half of the San Andreas fault slipping one way and the southern half of the fault slipping the opposite direction; in clear contrast to reality. It gets worse though. After inspecting the model further, I suspect that at least half of the faults in the UCERF3 model are slipping in the wrong direction. This presents a major problem for earthquake simulators, where the reversing the slip direction of a fault will reverse the stress interaction on nearby faults (e.g. changing a stress increase to a stress decrease). If faults are slipping the wrong direction, then the stress interaction physics we want to model gets thrown out the window.
+                    
+                <h6 class="note text-center"> You build tools to detect problematic faults and to fix them. </h6>
+                    <p class="text-left">
+                    In this post I will describe the methods and tools I have developed (with important contributions from fellow graduate student John Wilson) to fix the USGS fault model. I will also include links and explanations along the way of the python scripts I wrote that allow us to further improve the model each time we find a new instance of a fault slipping the wrong direction. Additionally, the scripts will re-index the entire fault model such that all indices (of sections and elements) appear in the correct order along each fault. We need to apply the following fixes:
+                    <ul>
+                        <li> Group single faults that come labeled as multiple faults (e.g. San Andreas is labeled as more than 10 different faults)</li>
+                        <li> Re-index the fault model so that the indices (of sections and elements) appear in order along the direction of the fault </li>
+                        <li> Assert that the faults actually slip in the correct direction </li>
+                    </ul>
+                    </p>
+                    <p class="text-left"> These scripts are <a href="https://github.com/kwschultz/VQModels/blob/master/fault_match.py" target="_blank">fault_match.py</a>, <a href="https://github.com/kwschultz/VQModels/blob/master/sectioning.py" target="_blank">sectioning.py</a>, <a href="https://github.com/kwschultz/VQModels/blob/master/elements.py" target="_blank">elements.py</a> and <a href="https://github.com/kwschultz/VQModels/blob/master/vertices.py" target="_blank">vertices.py</a>; all are found in my github repository <a href="https://github.com/kwschultz/VQModels/" target="_blank">github.com/kwschultz/VQModels/</a>. 
+                    <br> These tools utilize <b>regular expressions</b>, the Python geospatial library <b>Shapely</b>, the Python module <b>quakelib</b> that we develop and provide along with Virtual Quake, and good old-fashioned re-indexing math.
+                    </p>
+                </div>
+            </div>
+        </div>    
+    
+            
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> Overview of the fault model data hierarchy </h6>    
+                    
+                    <p class="text-left">  Lets take a brief moment to discuss the hierarchy of finite fault models. A fault model is essentially a database of fault properties with multiple indices. Each level of the data is bulleted below.
+                    
+                        <ul>
+                        <li> <b>A fault</b> is a planar surface on which dislocations occur; earthquakes. A fault's physical properties can vary as one moves along the fault, but the properties do not very that much. The first index of our fault model is the <b> fault ID </b>. All other data structures belong to one and only one fault. </li>
+                        
+                        <li> <b>A fault section</b> is the next level of data structure. Each fault has multiple sections, and the fault's physical properties are constant within a section. This is the second index for our fault model, every section has a unique <b>section ID</b>. Each section belongs to one and only one fault. </li>
+                        
+                        <li> <b>A fault element</b> is the interacting member of the physics-based simulation. Every fault is comprised of fault elements, and for the UCERF3 model, we discretize the faults into 3km by 3km square elements. Our stress interaction physics is used to determine to stress increases and decreases between each pair of fault elements in the model due to stress loading and earthquakes. An earthquake is an event where groups of fault elements slip. Fault elements represent the third index for our fault model. Every element has a unique <b>element ID</b>, and each element belongs one and only one section. </li>
+                        
+                        <li> <b>A vertex</b> is a point in latitude/longitude/depth space that defines one corner of a square fault element. This is the fourth index for our fault model. Every fault element has four vertices (lets call them vertex_0, vertex_1, vertex_2, vertex_3), and each vertex has a unique <b>vertex ID</b>. The order of the vertices for a particular fault element matters. The vector from vertex_0 to vertex_2 sets the slip direction for the fault element. Therefore, if we switch the order of the vertices within an element, we are switching the element's slip direction. </li>
+                        
+                        
+                        </ul>
+                        
+
+                    </p>
+                </div>
+            </div>
+
+        </div>    
+            
+        <hr>    
+            
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> How do we know if a fault is slipping the wrong direction? </h6>    
+                    
+                    <p class="text-left">  First, what is the direction of a fault? In geological terms, each fault is given a slip direction by specifying its <b>strike angle</b> (and also a rake angle but its not important here). The strike angle is measured <b>clockwise from north</b> as shown in the figure below for the Elsinore fault in southern California. </p>
+                    
+                    <div class="c8 first">
+                        <img src="elsinore_annotated_strike.png" width="500" height="327" align="center">
+                    </div>   
+                    
+                    <p class="text-left"> The problem with faults in the UCERF3 model slipping the wrong way is due to an improperly prescribed strike angle. And after an exhaustive inspection of the model, faults either have the correct strike angle or they are 180 degrees off. The Elsinore fault as shown has the correct strike angle in the UCERF3 model. However, the strike angle for the northern half of the San Andreas fault is around 130 degrees, while the strike angle for the southern half is around 300 degrees. Meaning that the northern half slips northward while the southern half slips southward, a clear error.
+                    
+                    
+                    <br><br> <b> The method I have developed for re-aligning the faults in the correct direction uses a dictionary of target strike values that we want the faults to have and then iterates through all levels of the fault model data structure and aligns the indices to appear in order along strike.</b> This method cannot properly fix the entire fault model off the bat, since we do not have easy access to a database of the correct strike values. The first iteration of these fixes has involved checking the <a href="http://geohazards.usgs.gov/cfusion/qfault/query_main_AB.cfm" target="_blank">USGS's own fault database</a> and recording the correct strikes by hand for about 20 major faults. However, this method can be used to improve the model as readily as new, accurate strike data can be ingested. The best approach would be a web-scraping approach to grab the correct strike data from the database, however in initially exploring this option I have found a big complication; there is no guaranteed database entry for each UCERF3 fault name. 
+
+                    </p>
+                </div>
+            </div>
+
+        </div>         
+        
+        
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> Lets re-group the faults </h6>    
+                    
+                    <p class="text-left"> For some reason the UCERF3 model treats the sections of many major faults as their own faults. For Virtual Quake, the distinction between faults and fault sections has an impact on the simulation. I have developed another algorithm in the simulation that uses a fault's geometry information (total area, length, etc.) to determine the stress drops for that fault. The stress drops are used in the simulation to determine how much each fault element should slip during an earthquake given the levels of stress. Since the UCERF3 model as provided to us is over-faulted, we must combine the given faults into the smaller number of real faults that we have in California.
+                    
+                    <br> For example the Coachella, Cholame, and Big Bend sections of the San Andreas in southern California all have different fault IDs and belong to different "faults". The section names in the UCERF3 model are all of the form "fault_name_subsection_name_[number]". For instance, lets look at the section names for the San Andreas sections mentioned above. 
+                    
+                    <ul>
+                        <li> San_Andreas_Coachella_rev_Subsection_0 with fault ID 295 </li>
+                        <li> San_Andreas_Coachella_rev_Subsection_1 with fault ID 295 </li>
+                        <li> ... </li>
+                        <li> San_Andreas_Cholame_rev_Subsection_0 with fault ID 285 </li>
+                        <li> San_Andreas_Cholame_rev_Subsection_1 with fault ID 285 </li>
+                        <li> ... </li>
+                        <li> San_Andreas_Big_Bend_Subsection_0 with fault ID 287 </li>
+                        <li> San_Andreas_Big_Bend_Subsection_1 with fault ID 287 </li>
+                        <li> ... </li>
+                    </ul>
+                    </p>
+                    
+                    <p class="text-left"> Just inspecting the names of these sections tells you that they all belong to the San Andreas fault. <b>And there we have it, we only need to look at the names of each fault section to determine which fault to match the section to.</b> All we need to do is to use <b>regular expressions</b> to trim off the non-fault-specific bits of each section name and that trimmed section name will be the unique fault name. This is exactly the word slicing and dicing that <a href="https://github.com/kwschultz/VQModels/blob/master/fault_match.py" target="_blank">fault_match.py</a> does, trimming off non-unique fault identifiers in the section names like "_Subsection_0", "_rev", "_North", etc. After parsing the section names, we have a list of the unique fault names. Then we just need to keep a single fault ID for each unique fault name and assign that fault ID to each section that matches the unique fault name.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+        
+        
+        
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> We need the sections to appear in order along the fault strike </h6>    
+                    
+                    <p class="text-left"> Again contrary to their physical ordering, the sections provided in UCERF3 come <b>organized in alphabetical order by section name</b>, not in their actual order along the fault. There are multiple reasons why we want the section IDs and hence the sections to appear in order of appearance along the strike of the fault. This re-indexing will be more difficult than name matching because the section data only contains a name, an ID, and a list of elements that belong to that section.
+                    
+                    <br> In order to align the sections along the fault strike, I must use the positional information of the fault elements within each section. Then using say, a mean position of the elements within each section along with the target fault strike I can re-assign section IDs within a fault. If I can compute the distance along the fault of each section, then I have computed a score with which I can rank the sections in order along strike and re-assign the section IDs. This is where Python's <b>Shapely module</b> comes in handy. 
+                    
+                    <br> After computing the mean location (x,y) for each section within a fault, I need to create a Shapely Line object that has endpoints at each end of my fault. To do this I just select the pair of sections that have the farthest separated mean locations. However, there is a degeneracy here and this fault line I am creating needs to point in the direction of the correct strike. To do this I created functions that compute the strike angle of the line segment and choose the direction of the line to minimize the difference between the computed strike and the target strike for this fault - <b>being careful here when computing the difference between angles</b>. For example, what is the angular difference between a strike of 359 degrees and 1 degree? It's not 358 degrees.
+                    
+                    <br> Once I have created the Shapely line object that is in the correct strike direction, I can use Shapley's project() function to compute the distance of each section's mean location along the fault strike from 0 to 1. I then use these scores and re-assign section IDs within the fault to appear in order along strike. An example is shown in the figure below. The color of the stars indicate the section's projected distance along strike (darker is farther) and the black line in the fault-strike-aligned Shapely Line object. All of this is done by <a href="https://github.com/kwschultz/VQModels/blob/master/sectioning.py" target="_blank">sectioning.py</a>.
+                    
+                    <div class="c10 first">
+                        <img src="shapely_objects_from_trace_Elsinore.png" width="600" height="450" align="center">
+                    </div> 
+
+                </div>
+            </div>
+
+        </div>
+        
+        
+        <div class="g768">    
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> We also need the elements to appear in order along the fault strike </h6>    
+                    
+                    <p class="text-left"> Since the sections provided in UCERF3 come organized in alphabetical order by section name, this produces discontinuities in element IDs when stepping along a fault in the strike direction. Also the strike is not continuous within a fault, and can flip 180 degrees from section to section within a fault. Furthermore, since the element numbering increases "down" each fault with increasing depth, we cannot simply detect an incorrect element ordering and reverse it since the reversed ordering would increase "up" the fault with decreasing depth. The figure below illustrates a typical case of problematic element ordering and the corrected version.
+                    
+                    <div class="c8 first">
+                        <img src="element_ordering.png" width="500" height="218" align="center">
+                    </div> 
+                    </p>
+                    
+                   <p class="text-left">  If we cannot reverse the element ordering, what can we do? In order to change the element numbering along strike while preserving the element ordering convention (also used by Virtual Quake) of increasing element IDs with depth, we can just reorder each column of elements. We can use the provided, though incorrect, variable called "distance along strike" (or "DAS") that is specified for every vertex and every element. Even though we know the elements are out of order and hence the distance along strike values are incorrect, they are still constant with respect to each column as shown in the figure below. 
+                    
+                    All of this is done by <a href="https://github.com/kwschultz/VQModels/blob/master/elements.py" target="_blank">elements.py</a>.
+                    
+
+
+                </div>
+            </div>
+
+        </div>
+        
+        
+        
+        
+        
+		</div><!-- grid -->
+	</div><!-- content -->
+    
+        <!-- CSS CREDIT (I did not build this CSS) -->
+        <!-- -----------  
+		<div class="row">
+			<div class="c12 first">
+				<p class="text-right">Ivory CSS by <a href="http://weice.in" target="_blank">WEICE</a>, modified 05/16/2014 &nbsp;&nbsp;&nbsp;&nbsp;</p>
+			</div>
+				
+		</div>
+        -->
+
+</body>
+</html>
