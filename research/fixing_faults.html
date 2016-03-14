@@ -151,7 +151,7 @@
                     </ul>
                     </p>
                     
-                    <p class="text-left"> Just inspecting the names of these sections tells you that they all belong to the San Andreas fault. <b>And there we have it, we only need to look at the names of each fault section to determine which fault to match the section to.</b> All we need to do is to use <b>regular expressions</b> to trim off the non-fault-specific bits of each section name and that trimmed section name will be the unique fault name. This is exactly the word slicing and dicing that <a href="https://github.com/kwschultz/VQModels/blob/master/fault_match.py" target="_blank">fault_match.py</a> does, trimming off non-unique fault identifiers in the section names like "_Subsection_0", "_rev", "_North", etc. After parsing the section names, we have a list of the unique fault names. Then we just need to keep a single fault ID for each unique fault name and assign that fault ID to each section that matches the unique fault name.
+                    <p class="text-left"> Just inspecting the names of these sections tells you that they all belong to the San Andreas fault. <b>And there we have it, we only need to look at the names of each fault section to determine which fault to match the section to.</b> All we need to do is to use <b>regular expressions</b> to trim off the non-fault-specific bits of each section name and that trimmed section name will be the unique fault name. This is exactly the word slicing and dicing that <a href="https://github.com/kwschultz/VQModels/blob/master/fault_match.py" target="_blank">fault_match.py</a> does, trimming off non-unique fault identifiers in the section names like "_Subsection_0", "_rev", "_North", etc. After parsing the section names, we have a list of the unique fault names. Then we just need to keep a single fault ID for each unique fault name and assign that fault ID to each section that matches the unique fault name. This reduces the 313 faults in the original UCERF3 model to 256 unique faults.
                     </p>
                 </div>
             </div>
@@ -191,22 +191,56 @@
                     <p class="text-left"> Since the sections provided in UCERF3 come organized in alphabetical order by section name, this produces discontinuities in element IDs when stepping along a fault in the strike direction. Also the strike is not continuous within a fault, and can flip 180 degrees from section to section within a fault. Furthermore, since the element numbering increases "down" each fault with increasing depth, we cannot simply detect an incorrect element ordering and reverse it since the reversed ordering would increase "up" the fault with decreasing depth. The figure below illustrates a typical case of problematic element ordering and the corrected version.
                     
                     <div class="c8 first">
-                        <img src="element_ordering.png" width="500" height="218" align="center">
-                    </div> 
+                        <img src="DAS_groups.png" width="500" height="258" align="center">
+                    </div>
                     </p>
                     
-                   <p class="text-left">  If we cannot reverse the element ordering, what can we do? In order to change the element numbering along strike while preserving the element ordering convention (also used by Virtual Quake) of increasing element IDs with depth, we can just reorder each column of elements. We can use the provided, though incorrect, variable called "distance along strike" (or "DAS") that is specified for every vertex and every element. Even though we know the elements are out of order and hence the distance along strike values are incorrect, they are still constant with respect to each column as shown in the figure below. 
-                    
-                    All of this is done by <a href="https://github.com/kwschultz/VQModels/blob/master/elements.py" target="_blank">elements.py</a>.
+                   <p class="text-left">  If we cannot reverse the element ordering, what can we do? In order to change the element numbering along strike while preserving the element ordering convention (also used by Virtual Quake) of increasing element IDs with depth, we can just reorder each column of elements. We can use the provided, though incorrect, variable called "distance along strike" (or "DAS") that is specified for every vertex and hence every element. Even though we know the elements are out of order and hence the distance along strike values are out of order, they are still constant with respect to each column as shown in the figure above.
+                   
+                   <br> As such I use the prescribed DAS values as the index for each column of elements and build a dictionary of all element IDs in each DAS column. I then compute the strike angle of the line segment connecting the minimum and maximum element ID in each section and determine if the elements are reversed by comparing this to the correct strike angle. If the section has elements out of order, I iterate over the dictionary of elements indexed by DAS and reverse the order of the columns of elements in the section. It is then straightforward to use the DAS index, the number of elements per column (observed to be constant within sections) and the minimum element ID in each section to re-index the element IDs within the section. Then one final iteration the new element IDs in order to set the correct DAS values for each element's vertices, utilizing the lengths of the elements computed from vertex locations.
+                    <br> All of this is done by <a href="https://github.com/kwschultz/VQModels/blob/master/elements.py" target="_blank">elements.py</a>, which finds that 1076 of the 2606 (41.3%) UCERF3 fault sections have elements indexed in the opposite order of the strike direction.
                     
 
-
+                    </p>
                 </div>
             </div>
 
         </div>
         
         
+        <div class="g768">
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> Last and most importantly, the vertex ordering within the elements must align with the strike </h6>
+                    
+                    <p class="text-left"> During a Virtual Quake simulation, we compute the slip direction for a fault element using the vector between its first and third vertex (the ones at the top of the square). This slip direction goes into Greens function matrix calculations which set the stress interactions for the simulation. If the vertex ordering does not match the true strike direction for the fault, the fault elements will slip in the wrong direction and we will not properly model stress interactions.
+                    
+                    <br> Because we are now operating at the lowest level in our fault model data structure, this index remapping is the simplest. We only need to iterate over the fault elements once and check that the strike computed from the vertex ordering matches the true strikes for the faults. If they do not match, simply switch the ordering of the vertices within the fault element. All of this is done by <a href="https://github.com/kwschultz/VQModels/blob/master/vertices.py" target="_blank">vertices.py</a>, which finds that 1561 of the 21833 (7.2%) UCERF3 fault elements have vertices indexed in the opposite order of the strike direction. This number will only increase as more accurate strike data can be ingested.
+                    
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+        
+        
+        
+        <div class="g768">
+            <div class="row">
+                <div class="c12 first">
+                    <h6 class="note text-center"> The effect of re-indexing on simulated earthquakes </h6>
+                    
+                    <p class="text-left"> Even though the re-indexing process only changes the slip direction of 7.2% of the 21833 fault elements, it has a noticeable effect on simulated earthquake rates. The plot below shows two 10,000 year simulations of the UCERF3 model before and after re-indexing. Both fault models simulated below have contain the same faults (both had fault_match.py script applied).  <b>The only difference is the simulated labeled "Re-Indexed UCERF3" was also run through the other re-indexing scripts (sectioning.py, elements.py, and vertices.py).</b> The vertical axis on the plot below is the number of earthquakes, the horizontal axis is the magnitude. The vertical axis is on a logarithmic scale, so being able to distinguish the two curves means there is a large difference in the number of earthquakes. Further improvements to the fault model will make this difference even more apparent.
+                    </p>
+                    
+                    <div class="c8 first">
+                        <img src="freq_mag_MULTI_EVENT_FILE_yearMax10000_minMag_5-0_UCERF3_ReFaulted_AseismicCut0-11_taper_renorm_50kyr_dyn0-3_stressDrops0-5_dynDrops_MagFix.png" width="703" height="545" align="center">
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
         
         
         
