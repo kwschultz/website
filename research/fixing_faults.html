@@ -230,13 +230,13 @@
         <div class="g768">
             <div class="row">
                 <div class="c12 first">
-                    <h6 class="note text-center"> The effect of reversing the slip direction on simulated earthquakes </h6>
+                    <h6 class="note text-center"> The effect of re-faulting and re-aligning on simulated earthquakes </h6>
                     
-                    <p class="text-left"> &emsp;Even though the re-indexing process only changes the slip direction of 7.2% of the 21833 fault elements, it has a noticeable effect on simulated earthquake rates. The plot below shows two 10,000 year simulations of the UCERF3 model before and after re-indexing. Both fault models simulated below have contain the same faults (both had fault_match.py script applied).  <b>The only difference is the simulated labeled "Re-Indexed UCERF3" was also run through sectioning.py, elements.py, and vertices.py.</b> The vertical axis on the plot below is the number of earthquakes, the horizontal axis is the magnitude. The vertical axis is on a logarithmic scale, so being able to distinguish the two curves means there is a large difference in the number of earthquakes. Further improvements to the fault model will make this difference even more apparent.
+                    <p class="text-left"> &emsp; After applying the four python scripts to the UCERF3 fault model, I reduce the number of faults from 313 to 256 and reverse the slip direction on 7.2% of the 21833 fault elements (correcting the slip direction for 15 major faults). The fault grouping operation gives us fewer faults with larger surface areas, which allows Virtual Quake to prescribe more displacement given the same stress accumulation per earthquake. These two effects have a noticeable effect on simulated earthquake rates. The plot below shows two 10,000 year simulations of the UCERF3 model before and after fault regrouping and slip realignment. The vertical axis is the number of earthquakes, the horizontal axis is the magnitude. The red boxes are the 95% confidence bounds for the observed earthquake rates in California from 1932 to 2011; hitting more boxes is better. The vertical axis is on a logarithmic scale, so being able to distinguish the two curves means there is a very large difference in the number of earthquakes of a given magnitude. Further improvements to the fault model will make this difference even more apparent, and give us a more physically accurate fault model.
                     </p>
                     
                     <div class="c8 first">
-                        <img src="freq_mag_MULTI_EVENT_FILE_yearMax10000_minMag_5-0_UCERF3_ReFaulted_AseismicCut0-11_taper_renorm_50kyr_dyn0-3_stressDrops0-5_dynDrops_MagFix.png" width="703" height="545" align="center">
+                        <img src="freq_mag_MULTI_EVENT_FILE_yearMax10000_minMag_6-0_UCERF3_Standard_AseismicCut_0-11_TaperRenorm_10kyr_dyn0-3_stressDrops0-5_DynDrops.png" width="706" height="543" align="center">
                     </div>
                     
                 </div>
